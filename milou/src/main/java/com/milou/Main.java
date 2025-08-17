@@ -2,11 +2,13 @@ package com.milou;
 
 import java.util.Scanner;
 
+import com.milou.model.User;
 import com.milou.service.UserService;
 
 public class Main {
     private static final Scanner in = new Scanner(System.in);
     private static final UserService userService = new UserService();
+    private static User currentUser;
 
     public static void main(String[] args) {
         while (true) {
@@ -15,7 +17,7 @@ public class Main {
             try {
                 switch (choice) {
                     case "L" -> {
-                        // LOGIN
+                        login();
                     }
                     case "S" -> {
                         signup();
@@ -26,6 +28,15 @@ public class Main {
                 System.out.println(e.getMessage());
             }
         }
+    }
+
+    private static void login() {
+        System.out.print("Email: ");
+        String email = in.nextLine().trim();
+        System.out.print("Password: ");
+        String password = in.nextLine().trim();
+        currentUser = userService.login(email, password);
+        System.out.println("Welcome back, " + currentUser.getName() + "!");
     }
 
     private static void signup() {
