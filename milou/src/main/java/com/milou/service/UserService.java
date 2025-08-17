@@ -43,6 +43,15 @@ public class UserService {
         });
     }
 
+    public User findByEmail(String email) {
+        String normalizedEmail = normalizeEmail(email);
+
+        return sessionFactory
+                .fromTransaction(session -> session.createQuery("from User where email = :email", User.class)
+                        .setParameter("email", normalizedEmail)
+                        .uniqueResult());
+    }
+
     private String normalizeEmail(String input) {
         if (!input.contains("@"))
             return input + "@milou.com";
