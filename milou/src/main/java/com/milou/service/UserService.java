@@ -28,6 +28,21 @@ public class UserService {
         });
     }
 
+    public User login(String email, String password) {
+        String normalizedEmail = normalizeEmail(email);
+
+        return sessionFactory.fromTransaction(session -> {
+            User user = session.createQuery("from User where email = :email and password = :password", User.class)
+                    .setParameter("email", normalizedEmail)
+                    .setParameter("password", password)
+                    .uniqueResult();
+            if (user == null)
+                throw new IllegalArgumentException("Invalid email or password.");
+
+            return user;
+        });
+    }
+
     private String normalizeEmail(String input) {
         if (!input.contains("@"))
             return input + "@milou.com";
