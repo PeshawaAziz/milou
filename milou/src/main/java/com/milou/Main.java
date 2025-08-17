@@ -1,5 +1,7 @@
 package com.milou;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import com.milou.model.User;
@@ -65,7 +67,7 @@ public class Main {
             try {
                 switch (choice) {
                     case "S" -> {
-                        // SEND
+                        sendEmail();
                     }
                     case "V" -> {
                         // VIEW
@@ -82,5 +84,17 @@ public class Main {
                 System.out.println(e.getMessage());
             }
         }
+    }
+
+    private static void sendEmail() {
+        System.out.print("Recipient(s): ");
+        List<String> recipients = Arrays.asList(in.nextLine().trim().split(","));
+        System.out.print("Subject: ");
+        String subject = in.nextLine().trim();
+        System.out.print("Body: ");
+        String body = in.nextLine().trim();
+        String code = emailService.sendEmail(currentUser, recipients, subject, body);
+        System.out.println("Successfully sent your email.");
+        System.out.println("Code: " + code);
     }
 }

@@ -2,6 +2,7 @@ package com.milou.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.hibernate.Session;
@@ -17,8 +18,8 @@ public class EmailService {
     private final Random random = new Random();
     private final String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-    public String sendEmail(User sender, ArrayList<String> recipientEmails, String subject, String body) {
-        ArrayList<User> recipients = new ArrayList<>();
+    public String sendEmail(User sender, List<String> recipientEmails, String subject, String body) {
+        List<User> recipients = new ArrayList<>();
 
         for (String email : recipientEmails) {
             User user = new UserService().findByEmail(email.trim());

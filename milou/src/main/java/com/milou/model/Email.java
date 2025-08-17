@@ -2,6 +2,7 @@ package com.milou.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -41,7 +42,7 @@ public class Email {
     private User sender;
 
     @OneToMany(mappedBy = "email", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private ArrayList<EmailRecipient> recipients = new ArrayList<>();
+    private List<EmailRecipient> recipients = new ArrayList<>();
 
     public Email() {
     }
@@ -94,11 +95,11 @@ public class Email {
         this.sender = sender;
     }
 
-    public ArrayList<EmailRecipient> getRecipients() {
+    public List<EmailRecipient> getRecipients() {
         return recipients;
     }
 
-    public void setRecipients(ArrayList<EmailRecipient> recipients) {
+    public void setRecipients(List<EmailRecipient> recipients) {
         this.recipients = recipients;
     }
 
