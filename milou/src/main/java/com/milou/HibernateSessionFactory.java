@@ -9,7 +9,7 @@ public class HibernateSessionFactory {
     public static SessionFactory get() {
         if (sessionFactory == null) {
             sessionFactory = new Configuration()
-                    .configure("resources/hibernate.cfg.xml")
+                    .configure("hibernate.cfg.xml")
                     .buildSessionFactory();
         }
         return sessionFactory;
