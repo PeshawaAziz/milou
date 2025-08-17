@@ -25,3 +25,6 @@ replay_pid*
 
 # Hibernate ORM
 milou/src/main/resources/hibernate.cfg.xml
+
+# Maven
+target/
