@@ -115,9 +115,8 @@ public class EmailService {
             Email email = session.createQuery("from Email where code = :code", Email.class)
                     .setParameter("code", code)
                     .uniqueResult();
-            if (email == null) {
+            if (email == null)
                 throw new IllegalArgumentException("Email not found.");
-            }
 
             boolean isSender = email.getSender().equals(user);
             EmailRecipient er = session
@@ -154,5 +153,54 @@ public class EmailService {
                 .append(email.getBody());
 
         return sb.toString();
+    }
+
+    public String replyToEmail(User user, String code, String body) {
+        return sessionFactory.fromTransaction(session -> {
+            Email originalEmail = session.createQuery(
+                    "from Email where code = :code", Email.class)
+                    .setParameter("code", code)
+                    .uniqueResult();
+
+            if (originalEmail == null)
+                throw new IllegalArgumentException("Email not found.");
+
+            EmailRecipient participant = session.createQuery(
+                    "from EmailRecipient er where er.email = :email and er.recipient = :user",
+                    EmailRecipient.class)
+                    .setParameter("email", originalEmail)
+                    .setParameter("user", user)
+                    .uniqueResult();
+
+            boolean isSender = originalEmail.getSender().equals(user);
+            if (participant == null && !isSender)
+                throw new IllegalArgumentException("You cannot reply to this email.");
+
+            List<User> recipients = new ArrayList<>();
+
+            if (!isSender)
+                recipients.add(originalEmail.getSender());
+
+            originalEmail.getRecipients().stream()
+                    .map(EmailRecipient::getRecipient)
+                    .filter(r -> !r.equals(user))
+                    .forEach(recipients::add);
+
+            if (recipients.isEmpty())
+                throw new IllegalArgumentException("No recipients for reply.");
+
+            Email reply = new Email();
+            reply.setSender(user);
+            reply.setSubject("[Re] " + originalEmail.getSubject());
+            reply.setBody(body);
+            reply.setSentDate(new Date());
+            reply.setCode(generateUniqueCode(session));
+            session.persist(reply);
+
+            for (User recipient : recipients)
+                session.persist(new EmailRecipient(reply, recipient));
+
+            return reply.getCode();
+        });
     }
 }

@@ -73,7 +73,7 @@ public class Main {
                         viewEmails();
                     }
                     case "R" -> {
-                        // REPLY
+                        replyEmail();
                     }
                     case "F" -> {
                         // FORWARD
@@ -123,4 +123,15 @@ public class Main {
             default -> System.out.println("Invalid choice.");
         }
     }
+
+    private static void replyEmail() {
+        System.out.print("Code: ");
+        String code = in.nextLine().trim();
+        System.out.print("Body: ");
+        String body = in.nextLine().trim();
+        String newCode = emailService.replyToEmail(currentUser, code, body);
+        System.out.println("Successfully sent your reply to email " + code + ".");
+        System.out.println("Code: " + newCode);
+    }
+
 }
