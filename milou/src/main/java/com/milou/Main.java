@@ -59,7 +59,10 @@ public class Main {
     }
 
     private static void userMenu() {
-        // print unread emails
+        List<String> unread = emailService.getUnreadEmails(currentUser);
+        System.out.println(unread.size() + " unread emails:");
+
+        unread.forEach(System.out::println);
 
         while (true) {
             System.out.print("[S]end, [V]iew, [R]eply, [F]orward: ");
@@ -76,7 +79,7 @@ public class Main {
                         replyEmail();
                     }
                     case "F" -> {
-                        // FORWARD
+                        forwardEmail();
                     }
                     default -> System.out.println("Invalid choice.");
                 }
@@ -134,4 +137,13 @@ public class Main {
         System.out.println("Code: " + newCode);
     }
 
+    private static void forwardEmail() {
+        System.out.print("Code: ");
+        String code = in.nextLine().trim();
+        System.out.print("Recipient(s): ");
+        List<String> recipients = Arrays.asList(in.nextLine().trim().split(","));
+        String newCode = emailService.forwardEmail(currentUser, code, recipients);
+        System.out.println("Successfully forwarded your email.");
+        System.out.println("Code: " + newCode);
+    }
 }

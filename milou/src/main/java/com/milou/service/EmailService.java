@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -201,6 +202,64 @@ public class EmailService {
                 session.persist(new EmailRecipient(reply, recipient));
 
             return reply.getCode();
+        });
+    }
+
+    public String forwardEmail(User user, String code, List<String> newRecipientEmails) {
+        List<User> newRecipients = new ArrayList<>();
+
+        for (String e : newRecipientEmails) {
+            User u = new UserService().findByEmail(e.trim());
+
+            if (u == null)
+                throw new IllegalArgumentException("User " + e + " not found.");
+
+            newRecipients.add(u);
+        }
+
+        if (newRecipients.isEmpty())
+            throw new IllegalArgumentException("No recipients specified.");
+
+        return sessionFactory.fromTransaction(session -> {
+            Email original = session.createQuery("from Email where code = :code", Email.class)
+                    .setParameter("code", code)
+                    .uniqueResult();
+            if (original == null)
+                throw new IllegalArgumentException("Email not found.");
+
+            boolean isSender = original.getSender() != null
+                    && user != null
+                    && Objects.equals(original.getSender().getId(), user.getId());
+            boolean canForward = isSender;
+
+            if (!isSender) {
+                EmailRecipient er = session.createQuery(
+                        "from EmailRecipient er where er.email = :email and er.recipient = :user",
+                        EmailRecipient.class)
+                        .setParameter("email", original)
+                        .setParameter("user", user)
+                        .uniqueResult();
+
+                canForward = er != null;
+            }
+
+            if (!canForward)
+                throw new IllegalArgumentException("You cannot forward this email.");
+
+            Email forward = new Email();
+            forward.setSender(user);
+            forward.setSubject("[Fw] " + original.getSubject());
+            forward.setBody(original.getBody());
+            forward.setSentDate(new Date());
+            forward.setCode(generateUniqueCode(session));
+            session.persist(forward);
+
+            for (User r : newRecipients) {
+                EmailRecipient er = new EmailRecipient(forward, r);
+                session.persist(er);
+            }
+
+            return forward.getCode();
         });
     }
 }
