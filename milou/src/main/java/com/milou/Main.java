@@ -70,7 +70,7 @@ public class Main {
                         sendEmail();
                     }
                     case "V" -> {
-                        // VIEW
+                        viewEmails();
                     }
                     case "R" -> {
                         // REPLY
@@ -96,5 +96,31 @@ public class Main {
         String code = emailService.sendEmail(currentUser, recipients, subject, body);
         System.out.println("Successfully sent your email.");
         System.out.println("Code: " + code);
+    }
+
+    private static void viewEmails() {
+        System.out.print("[A]ll emails, [U]nread emails, [S]ent emails, Read by [C]ode: ");
+        String choice = in.nextLine().trim().toUpperCase();
+        switch (choice) {
+            case "A" -> {
+                System.out.println("All Emails:");
+                emailService.getAllEmails(currentUser).forEach(System.out::println);
+            }
+            case "U" -> {
+                System.out.println("Unread Emails:");
+                emailService.getUnreadEmails(currentUser).forEach(System.out::println);
+            }
+            case "S" -> {
+                System.out.println("Sent Emails:");
+                emailService.getSentEmails(currentUser).forEach(System.out::println);
+            }
+            case "C" -> {
+                System.out.print("Code: ");
+                String code = in.nextLine().trim();
+                String content = emailService.readEmailByCode(currentUser, code);
+                System.out.println(content);
+            }
+            default -> System.out.println("Invalid choice.");
+        }
     }
 }
