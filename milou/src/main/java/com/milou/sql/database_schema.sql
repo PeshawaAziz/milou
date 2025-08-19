@@ -1,0 +1,29 @@
+CREATE DATABASE IF NOT EXISTS milou CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE milou;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS emails (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(255) NOT NULL UNIQUE,
+    subject VARCHAR(255) NOT NULL,
+    body TEXT,
+    sent_date TIMESTAMP NULL,
+    sender_id INT,
+    CONSTRAINT fk_email_sender FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS email_recipients (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email_id INT NOT NULL,
+    recipient_id INT NOT NULL,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT fk_email FOREIGN KEY (email_id) REFERENCES emails (id) ON DELETE CASCADE,
+    CONSTRAINT fk_recipient FOREIGN KEY (recipient_id) REFERENCES users (id) ON DELETE CASCADE
+);
